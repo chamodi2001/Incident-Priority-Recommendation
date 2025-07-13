@@ -8,34 +8,21 @@ GitHub , GitHub Actions:   Source control + deploy trigger
 GitLab: 	CI to build & store image
 AWS EC2:	Docker host running the app
 
-
-**GitHub Actions (CI/CD runner):**
-**Build Docker images for frontend + backend**
-  Build backend Docker image → Push to GitLab Registry
-  Build frontend Docker image → Push to GitLab Registry
-  SSH into EC2 → Run docker compose pull → up
-  Restart the app using docker compose up -d
-
-**On EC2 Instance**
- mysql container (Dockerized, running always)
- backend and frontend containers (fetched from GitLab Container Registry)
-
-
-_____________________________________________________________
+_________________________________________________________________________
 GitHub repo (Code)
       |
 GitHub Actions (CI/CD)
-
-     |
-     ├─> Build backend image → push to GitLab Container Registry
-     ├─> Build frontend image → push to GitLab Container Registry
-     └─> SSH into EC2 → pull images → docker compose up
+ Build backend image → push to GitLab Container Registry
+ Build frontend image → push to GitLab Container Registry
+ SSH into EC2 → pull images → docker compose up
      
 On EC2:
   - mysql container already running (docker-compose)
   - backend and frontend pull images from GitLab registry
 
-_____________________________________________________________
+CI: Automatically builds and stores app images when you update your code.
+CD: Automatically deploys those images to your server to run the app.
+_________________________________________________________________________
 
 **Structure**
 incident-tracker/
