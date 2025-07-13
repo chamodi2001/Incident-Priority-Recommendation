@@ -23,10 +23,9 @@ AWS EC2:	Docker host running the app
 
 _____________________________________________________________
 GitHub repo (Code)
-
-     |
-     v
+      |
 GitHub Actions (CI/CD)
+
      |
      ├─> Build backend image → push to GitLab Container Registry
      ├─> Build frontend image → push to GitLab Container Registry
