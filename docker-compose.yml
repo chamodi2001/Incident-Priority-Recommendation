@@ -38,7 +38,7 @@ services:
       DB_HOST: mysql
       DB_USER: root
       DB_PASSWORD: rootpass
-      DB_NAME: incident_tracker
+      DB_NAME: incident_trackerdb
     depends_on:
       - mysql
 
