@@ -1,43 +1,25 @@
 # IncidentTracker
-This project mimics a simplified internal tool used by SRE/DevOps/Monitoring teams to track real-time and historical incidents.
+Incident Tracker is a lightweight web application that logs and tracks operational incidents. It features AI-powered priority classification based on user input, with a clean dashboard to view incident details like severity, affected service, and timestamps.
 
 **Tech Stack**
-Frontend:	React.js + Tailwind CSS / Material UI
-Backend:  JSON Server (mock) OR Node.js OR Spring Boot
+Frontend:	React.js 
+Backend:  Node.js , Express js
 Docker: 	For containerization
-GitHub:   Source control + deploy trigger
+GitHub , GitHub Actions:   Source control + deploy trigger
 GitLab: 	CI to build & store image
 AWS EC2:	Docker host running the app
 
 
-[GitHub]
-▼
-Push Code ➝ GitHub Actions ➝ SSH into EC2 ➝ Pull Latest Docker Image
+**GitHub Actions (CI/CD runner):**
+**Build Docker images for frontend + backend**
+  Build backend Docker image → Push to GitLab Registry
+  Build frontend Docker image → Push to GitLab Registry
+  SSH into EC2 → Run docker compose pull → up
+  Restart the app using docker compose up -d
 
-[GitLab]
-▼
-On commit ➝ Build Docker Image ➝ Push to GitLab Container Registry
-
-[EC2]
-▼
-Docker Pull ➝ Docker Run (updated app)
-
-/////////
-With GitHub Actions, you’ll automate that process, plus add:
-
-✅ Build Docker images for frontend + backend
-
-✅ Push those Docker images to GitLab’s Container Registry
-
-✅ SSH into your EC2 server and:
-
-Pull new images
-
-Restart the app using docker compose up -d
-
-
-
-
+**On EC2 Instance**
+ mysql container (Dockerized, running always)
+ backend and frontend containers (fetched from GitLab Container Registry)
 
 
 _____________________________________________________________
@@ -53,4 +35,20 @@ GitHub Actions (CI/CD)
 On EC2:
   - mysql container already running (docker-compose)
   - backend and frontend pull images from GitLab registry
+
+_____________________________________________________________
+
+**Structure**
+incident-tracker/
+├── frontend/
+│   ├── Dockerfile
+│   └── ...
+├── backend/
+│   ├── Dockerfile
+│   └── ...
+├── docker-compose.yml
+├── .env
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
 
