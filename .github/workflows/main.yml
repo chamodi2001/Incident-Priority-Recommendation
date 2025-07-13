@@ -1,4 +1,4 @@
-name: Build & Deploy to EC2 from GitHub → GitLab Registry
+name: Build and Deploy
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: 🧾 Checkout code
       uses: actions/checkout@v3
 
     - name: Log in to GitLab Registry
@@ -18,35 +18,26 @@ jobs:
 
     - name: Build and Push Backend Image
       run: |
-        docker build -t registry.gitlab.com/chamodi2001/incident-tracker-backend:main ./backend
-        docker push registry.gitlab.com/chamodi2001/incident-tracker-backend:main
+        docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main ./backend
+        docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
+
 
     - name: Build and Push Frontend Image
       run: |
-        docker build -t registry.gitlab.com/chamodi2001/incident-tracker-frontend:main ./frontend
-        docker push registry.gitlab.com/chamodi2001/incident-tracker-frontend:main
+        docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./frontend
+        docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
 
     - name: Add SSH Key
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    - name: SSH to EC2 and deploy
+    - name: Deploy on EC2
       run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
-          cd ~/IncidentTracker
-
-          echo 🛑 Stop running containers
-          docker compose down
-
-          echo 🔐 Log in to GitLab registry
-          echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
-
-          echo 📥 Pull updated images
-          docker compose pull
-
-          echo 🚀 Start services
+        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
+          cd ~/incident-tracker &&
+          echo '${{ secrets.GITLAB_TOKEN }}' | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin &&
+          docker compose pull &&
+          docker compose down &&
           docker compose up -d
-
-          echo ✅ Deployment Complete
-EOF
+        "
