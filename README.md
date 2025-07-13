@@ -29,12 +29,14 @@ incident-tracker/
 ├── frontend/
 │   ├── Dockerfile
 │   └── ...
+
 ├── backend/
 │   ├── Dockerfile
 │   └── ...
+
 ├── docker-compose.yml
 ├── .env
-├── .github/
-│   └── workflows/
-│       └── deploy.yml
+└── .github/
+    └── workflows/
+        └── deploy.yml
 
