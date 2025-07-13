@@ -24,14 +24,14 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
             cd ~/incident-tracker
 
-            echo 🛑 Stop old containers
+            echo Stop old containers
             docker compose down
 
-            echo 📥 Pull latest image from GitLab Container Registry
+            echo Pull latest image from GitLab Container Registry
             echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
 
             docker compose pull backend
             docker compose up -d backend
 
-            echo ✅ Deployment Complete
+            echo Deployment Complete
 EOF
