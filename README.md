@@ -29,17 +29,26 @@ _________________________________________________________________________
 
 **Structure**
 incident-tracker/
+
 ├── frontend/
-│   ├── Dockerfile
-│   └── ...
+
+     │   ├── Dockerfile
+
+     │   └── ...
 
 ├── backend/
-│   ├── Dockerfile
-│   └── ...
+
+    │   ├── Dockerfile
+
+    │   └── ...
 
 ├── docker-compose.yml
+
 ├── .env
+
 └── .github/
+
     └── workflows/
+
         └── deploy.yml
 
