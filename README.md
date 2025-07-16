@@ -17,7 +17,7 @@ GitHub Actions (CI/CD)
 
  Build frontend image (In EC2) → push to GitLab Container Registry
 
- SSH into EC2 → pull images → docker compose up
+ SSH into EC2 → pull images → docker compose up (In EC2)
      
 On EC2:
   - mysql container already running (docker-compose)
