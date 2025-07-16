@@ -12,8 +12,11 @@ _________________________________________________________________________
 GitHub repo (Code)
       |
 GitHub Actions (CI/CD)
- Build backend image → push to GitLab Container Registry
- Build frontend image → push to GitLab Container Registry
+
+ Build backend image (In EC2) → push to GitLab Container Registry
+
+ Build frontend image (In EC2) → push to GitLab Container Registry
+
  SSH into EC2 → pull images → docker compose up
      
 On EC2:
