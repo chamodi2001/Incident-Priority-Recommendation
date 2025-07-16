@@ -24,6 +24,7 @@ On EC2:
   - backend and frontend pull images from GitLab registry
 
 CI: Automatically builds and stores app images when you update your code.
+
 CD: Automatically deploys those images to your server to run the app.
 _________________________________________________________________________
 
