@@ -16,16 +16,16 @@ jobs:
       run: echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
 
 
-        
+
     - name: Build and Push Backend Image
       run: |
-        docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main ./incident-tracker-server
-        docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
+        docker build -t registry.gitlab.com/chamodigunathilaka2018/IncidentTracker/incident-tracker-server:main ./incident-tracker-server
+        docker push registry.gitlab.com/chamodigunathilaka2018/IncidentTracker/incident-tracker-server:main
 
     - name: Build and Push Frontend Image
       run: |
-        docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./incident-tracker-client
-        docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
+        docker build -t registry.gitlab.com/chamodigunathilaka2018/IncidentTracker/incident-tracker-client:main ./incident-tracker-client
+        docker push registry.gitlab.com/chamodigunathilaka2018/IncidentTracker/incident-tracker-client:main
 
        ####################################
        # STEP 3: Deploy to EC2
@@ -36,7 +36,7 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          cd ~/incident-tracker
+          cd ~/IncidentTracker
 
           echo Logging in to GitLab Registry
           echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
