@@ -1,46 +1,29 @@
-  # backend:
-  #   build: ./backend
-  #   container_name: backend_api
-  #   restart: always
-  #   ports:
-  #     - "5000:5000"
-  #   depends_on:
-  #     - mysql
-  #   environment:
-  #     DB_HOST: mysql
-  #     DB_USER: root
-  #     DB_PASSWORD: rootpass
-  #     DB_NAME: incident_trackerdb
-
-
 version: '3.8'
 
 services:
   mysql:
     image: mysql:8
-    container_name: mysql_db
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: incident_trackerdb
+      MYSQL_DATABASE: incident_tracker
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
   backend:
-    image: registry.gitlab.com/chamodi2001/incident-tracker-backend:main
-    container_name: backend_api
-    restart: always
-    ports:
-      - "5000:5000"
-    environment:
-      DB_HOST: mysql
-      DB_USER: root
-      DB_PASSWORD: rootpass
-      DB_NAME: incident_trackerdb
+    image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
     depends_on:
       - mysql
+    ports:
+      - "5000:5000"
+
+  frontend:
+    image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
 
 volumes:
   mysql_data:
