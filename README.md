@@ -13,11 +13,11 @@ GitHub repo (Code)
       |
 GitHub Actions (CI/CD)
 
- Build backend image (In EC2) → push to GitLab Container Registry
+ Build backend image (Github Actions) → push to GitLab Container Registry
 
- Build frontend image (In EC2) → push to GitLab Container Registry
+ Build frontend image (Github Actions) → push to GitLab Container Registry
 
- SSH into EC2 → pull images → docker compose up (In EC2)
+ SSH into EC2 → pull images → docker compose up 
      
 On EC2:
   - mysql container already running (docker-compose)
