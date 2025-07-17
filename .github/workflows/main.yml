@@ -42,7 +42,7 @@ jobs:
             git checkout main
           else
             echo "Cloning the repository..."
-            git clone --branch main https://${{ secrets.GH_PAT }}@github.com/chamodigunathilaka2018/IncidentTracker.git
+            git clone --branch main https://${{ secrets.HUB_TOKEN }}@github.com/chamodigunathilaka2018/IncidentTracker.git
             cd IncidentTracker
           fi
 
