@@ -43,6 +43,7 @@ jobs:
             git checkout main
           else
             echo "Cloning the repository..."
+            # git clone --branch main https://${{ secrets.HUB_TOKEN }}@github.com/chamodi2001/IncidentTracker.git
             git clone --branch main https://${{ secrets.HUB_TOKEN }}@github.com/chamodi2001/IncidentTracker.git
             cd IncidentTracker
           fi
