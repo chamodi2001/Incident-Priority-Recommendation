@@ -33,6 +33,10 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
+         echo "✅ Connected to EC2. Verifying environment..."
+         whoami
+         hostname
+         pwd
           cd /home/ec2-user
 
           if [ -d "IncidentTracker" ]; then
