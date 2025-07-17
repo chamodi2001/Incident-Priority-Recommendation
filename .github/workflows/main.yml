@@ -34,7 +34,7 @@ jobs:
             # 1. Ensure directory exists and clone repo if not already
             if [ ! -d "~/incident-tracker" ]; then
               echo "Cloning project repo..."
-              git clone https://github.com/chamodigunathilaka2018/IncidentTracker.git ~/incident-tracker
+              git clone https://github.com/chamodi2001/IncidentTracker.git ~/incident-tracker
             else
               echo "Repo directory exists. Pulling latest changes..."
               cd ~/incident-tracker
