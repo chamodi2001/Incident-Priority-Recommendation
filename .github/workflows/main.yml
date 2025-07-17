@@ -18,62 +18,46 @@ jobs:
         docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main ./incident-tracker-server
         docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
 
+
     - name: Build and Push Frontend Image
       run: |
         docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./incident-tracker-client
         docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
 
-    - name: SSH into EC2 and Deploy via Docker Compose 🚀
+    
+
+    - name: SSH into EC2 and Deploy via Docker Compose
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          set -e # Exit immediately if a command exits with a non-zero status.
-
-          echo "✅ Connected to EC2. Verifying environment..."
-          whoami
-          hostname
-          pwd
-
-          # Ensure we are in the correct base directory before attempting to clone/pull
+         echo " Connected to EC2. Verifying environment..."
+         whoami
+         hostname
+         pwd
           cd /home/ec2-user
 
-          REPO_DIR="IncidentTracker"
-          # For a public repository, you typically don't need a token for cloning.
-          # If it's a private repository, ensure ${{ secrets.HUB_TOKEN }} is a valid GitHub Personal Access Token with repo scope.
-          REPO_URL="https://${{ secrets.HUB_TOKEN }}@github.com/chamodigunathilaka2018/IncidentTracker.git"
-          # If the repository is public and doesn't require a token, use:
-          # REPO_URL="https://github.com/chamodigunathilaka2018/IncidentTracker.git"
-
-
-          if [ -d "$REPO_DIR" ]; then
-            echo "Directory '$REPO_DIR' exists. Pulling latest changes..."
-            cd "$REPO_DIR"
-            git pull origin main || { echo "Git pull failed!"; exit 1; }
-            # The 'git checkout main' command is usually redundant after 'git pull origin main'
-            # if you are already on the main branch, but keeping it won't hurt.
-            # git checkout main
+          if [ -d "IncidentTracker" ]; then
+            echo "Directory exists. Pulling latest changes..."
+            cd IncidentTracker
+            git pull origin main
+            git checkout main
           else
-            echo "Cloning the repository '$REPO_DIR'..."
-            git clone --branch main $REPO_URL || { echo "Git clone failed!"; exit 1; }
-            cd "$REPO_DIR"
+            echo "Cloning the repository..."
+            git clone --branch main https://${{ secrets.HUB_TOKEN }}@github.com/chamodigunathilaka2018/IncidentTracker.git
+            cd IncidentTracker
           fi
 
           echo "Logging in to GitLab Container Registry"
-          # Use --password-stdin for secure password handling
-          echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin || { echo "Docker login failed!"; exit 1; }
+          echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
 
           echo "Pulling latest images"
-          # Ensure your EC2 instance has Docker Compose V2 (docker compose) or use docker-compose (V1)
-          docker compose pull || { echo "Docker compose pull failed!"; exit 1; }
+          docker compose pull
 
-          echo "Stopping old containers (if any are running)"
-          # '|| true' allows the script to continue if no containers are running (docker compose down fails if no containers)
-          docker compose down || true
+          echo "Stopping old containers"
+          docker compose down
 
           echo "Starting containers"
-          docker compose up -d || { echo "Docker compose up failed!"; exit 1; }
-
-          echo "Deployment completed successfully!"
+          docker compose up -d
