@@ -48,13 +48,9 @@ jobs:
               cd IncidentTracker
             fi
 
-            # echo "Pulling updated Docker images..."
-            # sudo docker compose pull
+            echo "Pulling updated Docker images..."
+            sudo docker compose pull
 
-            # echo "Restarting Docker containers..."
-            # sudo docker compose down
-            # sudo docker compose up -d
-
-            sudo docker-compose stop
-            sudo docker-compose pull   
-            sudo docker-compose up -d
+            echo "Restarting Docker containers..."
+            sudo docker compose down
+            sudo docker compose up -d
