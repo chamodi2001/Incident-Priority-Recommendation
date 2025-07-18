@@ -29,15 +29,23 @@ jobs:
 
       - name: SSH into EC2 and Deploy via Docker Compose
         uses: appleboy/ssh-action@master
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: GITLAB_TOKEN,HUB_TOKEN
           script: |
             cd /home/ec2-user
 
+            echo "Checking Docker and Docker Compose installation..."
+            docker --version
+            docker-compose --version
+
             echo "Logging into GitLab Container Registry..."
-            echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
+            echo "$GITLAB_TOKEN" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
 
             if [ -d "IncidentTracker" ]; then
               echo "Directory exists. Pulling latest changes..."
@@ -46,13 +54,16 @@ jobs:
               git checkout main
             else
               echo "Cloning the repository..."
-              git clone --branch main https://${{ secrets.HUB_TOKEN }}@github.com/chamodi2001/IncidentTracker.git
+              git clone --branch main https://$HUB_TOKEN@github.com/chamodi2001/IncidentTracker.git
               cd IncidentTracker
             fi
 
             echo "Pulling updated Docker images..."
-            sudo docker-compose pull
+            docker-compose pull
 
             echo "Restarting Docker containers..."
-            sudo docker-compose down
-            sudo docker-compose up -d
+            docker-compose down
+            docker-compose up -d
+
+            echo "Checking container status..."
+            docker-compose ps
