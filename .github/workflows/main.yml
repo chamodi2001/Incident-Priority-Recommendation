@@ -37,6 +37,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user
+
+            echo "Logging into GitLab Container Registry..."
+            echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
+
             if [ -d "IncidentTracker" ]; then
               echo "Directory exists. Pulling latest changes..."
               cd IncidentTracker
