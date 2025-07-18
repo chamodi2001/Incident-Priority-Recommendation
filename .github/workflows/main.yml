@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build and Deploy Incident Tracker
 
 on:
   push:
@@ -6,38 +6,53 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 🧾 Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout GitHub Repository
+        uses: actions/checkout@v3
 
-    - name: Log in to GitLab Registry
-      run: echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
+      - name: Log in to GitLab Container Registry
+        run: |
+          echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
 
-    - name: Build and Push Backend Image
-      run: |
-        docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main ./backend
-        docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main ./incident-tracker-server
+          docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
 
+      - name: Build and Push Frontend Image
+        run: |
+          docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./incident-tracker-client
+          docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
 
-    - name: Build and Push Frontend Image
-      run: |
-        docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./frontend
-        docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
+      - name: SSH into EC2 and Deploy via Docker Compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user
 
-    - name: Add SSH Key
-      uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+            echo "Logging into GitLab Container Registry..."
+            echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
 
-    - name: Deploy on EC2
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
-          cd ~/incident-tracker &&
-          echo '${{ secrets.GITLAB_TOKEN }}' | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin &&
-          docker compose pull &&
-          docker compose down &&
-          docker compose up -d
-        "
+            if [ -d "IncidentTracker" ]; then
+              echo "Directory exists. Pulling latest changes..."
+              cd IncidentTracker
+              git pull origin main
+              git checkout main
+            else
+              echo "Cloning the repository..."
+              git clone --branch main https://${{ secrets.HUB_TOKEN }}@github.com/chamodi2001/IncidentTracker.git
+              cd IncidentTracker
+            fi
+
+            echo "Pulling updated Docker images..."
+            sudo docker-compose pull
+
+            echo "Restarting Docker containers..."
+            sudo docker-compose down
+            sudo docker-compose up -d
