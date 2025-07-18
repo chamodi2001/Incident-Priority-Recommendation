@@ -14,12 +14,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Log in to GitLab Container Registry
-        env:
-          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          # echo "$GITLAB_TOKEN" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
           echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
-
 
       - name: Build and Push Backend Image
         run: |
