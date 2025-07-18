@@ -17,7 +17,9 @@ jobs:
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          echo "$GITLAB_TOKEN" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
+          # echo "$GITLAB_TOKEN" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
+          echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
+
 
       - name: Build and Push Backend Image
         run: |
@@ -39,7 +41,7 @@ jobs:
             cd /home/ec2-user
 
             echo "Logging into GitLab Container Registry..."
-            echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u gitlab-ci-token --password-stdin
+            echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
 
             if [ -d "IncidentTracker" ]; then
               echo "Directory exists. Pulling latest changes..."
