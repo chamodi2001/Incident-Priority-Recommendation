@@ -1,12 +1,19 @@
 # IncidentTracker
 Incident Tracker is a lightweight web application which allow users to submit incident reports and receive an estimated priority based on their responses. Future enhancements include integrating AI for smarter priority classification.
-**Tech Stack**
-Frontend:	React.js 
-Backend:  Node.js , Express js
-Docker: 	For containerization
-GitHub , GitHub Actions:   Source control + deploy trigger
-GitLab: 	CI to build & store image
-AWS EC2:	Docker host running the app
+
+_**Tech Stack**_
+
+**Frontend**:  React.js 
+
+**Backend**:   Node.js , Express js
+
+**Docker**:    For containerization
+
+**GitHub , GitHub Actions**:   Source control + deploy trigger
+
+**GitLab**:  CI to build & store image
+
+**AWS EC2**: Docker host running the app
 
 _________________________________________________________________________
 GitHub repo (Code)
