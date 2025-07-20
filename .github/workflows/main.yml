@@ -50,8 +50,8 @@ jobs:
             if [ -d "IncidentTracker" ]; then
               echo "Directory exists. Pulling latest changes..."
               cd IncidentTracker
-              git pull origin main
               git checkout main
+              git pull origin main      
             else
               echo "Cloning the repository..."
               git clone --branch main https://$HUB_TOKEN@github.com/chamodi2001/IncidentTracker.git

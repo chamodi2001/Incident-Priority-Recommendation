@@ -57,6 +57,15 @@ incident-tracker/
 └── .github/
 
     └── workflows/
+____________________________________________________________________________
 
-        └── deploy.yml
+Website Rendering,
+
+1. Check EC2 Public IP or Domain
+
+   Copy the EC2 instance's Public IPv4 address or Public DNS.
+
+2. Visit the Site in Your Browser
+
+http://<EC2_PUBLIC_IP>:<frontend_port>
 
