@@ -31,11 +31,12 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: GITLAB_TOKEN
+          envs: GITLAB_TOKEN,HUB_TOKEN
           script: |
             cd /home/ec2-user
 
@@ -46,7 +47,16 @@ jobs:
             echo "Logging into GitLab Container Registry..."
             echo "$GITLAB_TOKEN" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
 
-            cd IncidentTracker
+            if [ -d "IncidentTracker" ]; then
+              echo "Directory exists. Pulling latest changes..."
+              cd IncidentTracker
+              git checkout main
+              git pull origin main      
+            else
+              echo "Cloning the repository..."
+              git clone --branch main https://$HUB_TOKEN@github.com/chamodi2001/IncidentTracker.git
+              cd IncidentTracker
+            fi
 
             echo "Pulling updated Docker images..."
             docker-compose pull
