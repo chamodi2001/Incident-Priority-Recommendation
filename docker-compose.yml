@@ -1,22 +1,29 @@
+version: '3.8'
+
 services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: incident_trackerdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
   backend:
-    build: ./incident-tracker-server
+    image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
+    depends_on:
+      - mysql
     ports:
       - "5000:5000"
-    environment:
-      DB_HOST: host.docker.internal
-      DB_USER: root
-      DB_PASSWORD: rootpass
-      DB_NAME: incident_trackerdb
-      PORT: 5000
-    restart: unless-stopped
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   frontend:
-    build: ./incident-tracker-client
+    image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
     ports:
       - "3000:3000"
     depends_on:
       - backend
-    restart: unless-stopped
+
+volumes:
+  mysql_data:
