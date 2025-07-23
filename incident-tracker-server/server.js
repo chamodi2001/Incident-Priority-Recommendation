@@ -31,7 +31,7 @@ const initializeDatabase = () => {
     if (err) {
       console.error('Error creating incidents table:', err);
     } else {
-      console.log('✅ Incidents table ready');
+      console.log('Incidents table ready');
     }
   });
 
@@ -48,7 +48,7 @@ const initializeDatabase = () => {
     if (err && err.code !== 'ER_DUP_ENTRY') {
       console.error('Error inserting sample data:', err);
     } else {
-      console.log('✅ Sample data ready');
+      console.log('Sample data ready');
     }
   });
 };
@@ -80,6 +80,6 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
+  console.log(` Server running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/api/health`);
 });
