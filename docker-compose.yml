@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: incident_trackerdb
     ports:
-      - "3307:3306"
+      - "3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
@@ -18,12 +18,12 @@ services:
     depends_on:
       - mysql
     ports:
-      - "5000:5000"
+      - "5000"
 
   frontend:
     image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
     ports:
-      - "3000:3000"
+      - "3000"
     depends_on:
       - backend
 
