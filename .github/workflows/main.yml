@@ -64,6 +64,7 @@ jobs:
             echo "Restarting Docker containers..."
             docker-compose down
             docker-compose up -d
+            docker-compose up -d --build
 
             echo "Checking container status..."
             docker-compose ps
