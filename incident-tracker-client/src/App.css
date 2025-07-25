@@ -1,10 +1,11 @@
-/* Add to your CSS file */
+/* Incident Report Form Styling */
 .incident-report-form {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
 
+/* Section container */
 .form-section {
   margin-bottom: 30px;
   padding: 20px;
@@ -12,6 +13,12 @@
   border-radius: 8px;
 }
 
+/* Optional subtle section background for visual separation */
+.form-section:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Section headings */
 .form-section h3 {
   margin-top: 0;
   color: #333;
@@ -19,10 +26,12 @@
   padding-bottom: 10px;
 }
 
+/* Field container */
 .form-group {
   margin-bottom: 15px;
 }
 
+/* Field label */
 .form-group label {
   display: block;
   margin-bottom: 5px;
@@ -30,6 +39,7 @@
   color: #555;
 }
 
+/* Text inputs, textareas, selects */
 .form-group input[type="text"],
 .form-group input[type="number"],
 .form-group textarea,
@@ -39,12 +49,39 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  transition: all 0.2s ease-in-out;
 }
 
+/* Checkbox spacing */
 .form-group input[type="checkbox"] {
   margin-right: 8px;
 }
 
+/* Focus styles for accessibility */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-color: #80bdff;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Error styles (if validation is used) */
+.form-group .error {
+  color: #dc3545;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+input.error,
+textarea.error,
+select.error {
+  border-color: #dc3545;
+  background-color: #f8d7da;
+}
+
+/* Priority button */
 .calculate-priority-btn {
   background-color: #17a2b8;
   color: white;
@@ -53,8 +90,18 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  transition: all 0.2s ease-in-out;
 }
 
+.calculate-priority-btn:hover {
+  opacity: 0.9;
+}
+
+.calculate-priority-btn:active {
+  transform: scale(0.98);
+}
+
+/* Priority result container */
 .priority-result {
   margin-top: 15px;
   padding: 15px;
@@ -62,6 +109,7 @@
   font-weight: bold;
 }
 
+/* Priority color coding */
 .priority-critical {
   background-color: #f8d7da;
   color: #721c24;
@@ -86,6 +134,7 @@
   border: 1px solid #c3e6cb;
 }
 
+/* Form actions (submit/cancel buttons) */
 .form-actions {
   display: flex;
   gap: 10px;
@@ -99,6 +148,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  transition: all 0.2s ease-in-out;
 }
 
 .form-actions button[type="submit"] {
@@ -109,4 +159,28 @@
 .form-actions button[type="button"] {
   background-color: #6c757d;
   color: white;
+}
+
+.form-actions button:hover {
+  opacity: 0.9;
+}
+
+.form-actions button:active {
+  transform: scale(0.98);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .incident-report-form {
+    padding: 10px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
 }
