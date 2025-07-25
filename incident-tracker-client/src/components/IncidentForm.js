@@ -75,10 +75,6 @@ const IncidentReport = () => {
           <input type="text" name="affectedUsers" value={formData.affectedUsers} onChange={handleInputChange} />
         </div>
 
-        <div className="form-group">
-          <label>6. Is the issue regional or global? Specify affected regions if applicable:</label>
-          <input type="text" name="affectedRegions" value={formData.affectedRegions} onChange={handleInputChange} />
-        </div>
 
         <div className="form-group">
           <label>7. Are high-priority users (e.g., VIPs or executives) impacted?</label>
@@ -120,18 +116,8 @@ const IncidentReport = () => {
         </div>
 
         <div className="form-group">
-          <label>13. Is this incident related to a recent change (e.g., deployment, patch, config update)?</label>
-          <textarea name="relatedToChange" value={formData.relatedToChange} onChange={handleInputChange} rows="2" />
-        </div>
-
-        <div className="form-group">
           <label>14. Has this issue occurred before, or is it a known/recurring problem?</label>
           <textarea name="recurringIssue" value={formData.recurringIssue} onChange={handleInputChange} rows="2" />
-        </div>
-
-        <div className="form-group">
-          <label>15. What is the estimated time to resolution (ETR)?</label>
-          <input type="text" name="estimatedResolutionTime" value={formData.estimatedResolutionTime} onChange={handleInputChange} />
         </div>
 
         <div className="form-group">
