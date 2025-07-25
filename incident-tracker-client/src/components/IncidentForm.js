@@ -6,31 +6,24 @@ const IncidentReport = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
+    service: '',
     impactedSystem: '',
+    description: '',
+    affectedUsers: '',
+    affectedRegions: '',
+    highPriorityUsers: false,
+    highPriorityUserDetails: '',
     businessImpact: '',
-    impactWorsening: false,
-    internalUsersAffected: '',
-    externalUsersAffected: '',
-    userTypes: [],
-    financialImpact: false,
-    legalImpact: false,
-    vipUsersAffected: false,
-    vipDetails: '',
-    timeSensitive: false,
-    workarounds: '',
-    service: ''
+    issueStartTime: '',
+    currentStatus: '',
+    workaround: '',
+    riskToOtherSystems: '',
+    dataImpact: '',
+    relatedToChange: '',
+    recurringIssue: '',
+    estimatedResolutionTime: '',
+    stakeholderNotification: '',
   });
-
-  const [calculatedPriority, setCalculatedPriority] = useState('');
-  const [showPriorityExplanation, setShowPriorityExplanation] = useState('');
-
-  const userTypeOptions = [
-    'Customers',
-    'Partners', 
-    'Vendors',
-    'Internal Users'
-  ];
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -40,147 +33,11 @@ const IncidentReport = () => {
     }));
   };
 
-  const handleUserTypeChange = (e) => {
-    const { value, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      userTypes: checked 
-        ? [...prev.userTypes, value]
-        : prev.userTypes.filter(type => type !== value)
-    }));
-  };
-
-  const calculatePriority = () => {
-    let score = 0;
-    let explanation = [];
-
-    // System impact scoring
-    if (formData.impactedSystem.toLowerCase().includes('production') || 
-        formData.impactedSystem.toLowerCase().includes('critical')) {
-      score += 3;
-      explanation.push('Critical system affected');
-    }
-
-    // Business impact scoring
-    if (formData.businessImpact.toLowerCase().includes('no access') ||
-        formData.businessImpact.toLowerCase().includes('unable') ||
-        formData.businessImpact.toLowerCase().includes('down')) {
-      score += 3;
-      explanation.push('Severe business impact');
-    }
-
-    // Worsening impact
-    if (formData.impactWorsening) {
-      score += 2;
-      explanation.push('Impact worsening over time');
-    }
-
-    // User count impact
-    const internalCount = parseInt(formData.internalUsersAffected) || 0;
-    const externalCount = parseInt(formData.externalUsersAffected) || 0;
-    const totalUsers = internalCount + externalCount;
-
-    if (totalUsers > 1000) {
-      score += 3;
-      explanation.push('Large number of users affected (>1000)');
-    } else if (totalUsers > 100) {
-      score += 2;
-      explanation.push('Significant number of users affected (>100)');
-    } else if (totalUsers > 10) {
-      score += 1;
-      explanation.push('Multiple users affected');
-    }
-
-    // Customer impact
-    if (formData.userTypes.includes('Customers')) {
-      score += 2;
-      explanation.push('Customers affected');
-    }
-
-    // Financial/Legal impact
-    if (formData.financialImpact) {
-      score += 2;
-      explanation.push('Financial impact identified');
-    }
-    if (formData.legalImpact) {
-      score += 2;
-      explanation.push('Legal impact identified');
-    }
-
-    // VIP users
-    if (formData.vipUsersAffected) {
-      score += 2;
-      explanation.push('VIP users affected');
-    }
-
-    // Time sensitivity
-    if (formData.timeSensitive) {
-      score += 2;
-      explanation.push('Time-sensitive issue');
-    }
-
-    // No workarounds available
-    if (!formData.workarounds || formData.workarounds.toLowerCase().includes('none') || 
-        formData.workarounds.toLowerCase().includes('no')) {
-      score += 1;
-      explanation.push('No workarounds available');
-    }
-
-    // Determine priority based on score
-    let priority;
-    if (score >= 10) {
-      priority = 'critical';
-    } else if (score >= 7) {
-      priority = 'high';
-    } else if (score >= 4) {
-      priority = 'medium';
-    } else {
-      priority = 'low';
-    }
-
-    setCalculatedPriority(priority);
-    setShowPriorityExplanation(`Priority: ${priority.toUpperCase()} (Score: ${score}) - ${explanation.join(', ')}`);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Calculate priority before submitting
-    calculatePriority();
-    
-    const incidentData = {
-      title: formData.title,
-      severity: calculatedPriority || 'medium',
-      description: `
-System/Application Impacted: ${formData.impactedSystem}
-
-Business Impact: ${formData.businessImpact}
-
-Impact Worsening: ${formData.impactWorsening ? 'Yes' : 'No'}
-
-Users Affected:
-- Internal: ${formData.internalUsersAffected}
-- External: ${formData.externalUsersAffected}
-
-User Types: ${formData.userTypes.join(', ')}
-
-Financial Impact: ${formData.financialImpact ? 'Yes' : 'No'}
-Legal Impact: ${formData.legalImpact ? 'Yes' : 'No'}
-
-VIP Users Affected: ${formData.vipUsersAffected ? 'Yes' : 'No'}
-${formData.vipDetails ? `VIP Details: ${formData.vipDetails}` : ''}
-
-Time Sensitive: ${formData.timeSensitive ? 'Yes' : 'No'}
-
-Workarounds: ${formData.workarounds}
-
-Additional Description: ${formData.description}
-      `,
-      service: formData.service
-    };
 
     try {
-      await axios.post('http://localhost:5000/api/incidents', incidentData);
+      await axios.post('http://localhost:5000/api/incidents', formData);
       alert('Incident reported successfully!');
       navigate('/');
     } catch (error) {
@@ -191,205 +48,99 @@ Additional Description: ${formData.description}
 
   return (
     <div className="incident-report-form">
-      <h2>Report New Incident</h2>
+      <h2>Incident Impact Assessment</h2>
       <form onSubmit={handleSubmit}>
-        {/* Basic Information */}
-        <div className="form-section">
-          <h3>Basic Information</h3>
-          
-          <div className="form-group">
-            <label>Incident Title *</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Service/Application</label>
-            <input
-              type="text"
-              name="service"
-              value={formData.service}
-              onChange={handleInputChange}
-            />
-          </div>
+        <div className="form-group">
+          <label>1. What is the title of the incident?</label>
+          <input type="text" name="title" value={formData.title} onChange={handleInputChange} required />
         </div>
 
-        {/* Impact Assessment */}
-        <div className="form-section">
-          <h3>Impact Assessment</h3>
-          
-          <div className="form-group">
-            <label>1. Which system/application is impacted? *</label>
+        <div className="form-group">
+          <label>2. What service/application is affected?</label>
+          <input type="text" name="service" value={formData.service} onChange={handleInputChange} />
+        </div>
+
+        <div className="form-group">
+          <label>3. Which system, application, or service is impacted? Is this issue internal or customer-facing?</label>
+          <textarea name="impactedSystem" value={formData.impactedSystem} onChange={handleInputChange} rows="2" required />
+        </div>
+
+        <div className="form-group">
+          <label>4. Describe the business impact (e.g., critical functions disrupted, revenue loss, SLA breaches):</label>
+          <textarea name="businessImpact" value={formData.businessImpact} onChange={handleInputChange} rows="3" required />
+        </div>
+
+        <div className="form-group">
+          <label>5. Who is affected (e.g., internal staff, customers)? Please specify approximate count:</label>
+          <input type="text" name="affectedUsers" value={formData.affectedUsers} onChange={handleInputChange} />
+        </div>
+
+        <div className="form-group">
+          <label>6. Is the issue regional or global? Specify affected regions if applicable:</label>
+          <input type="text" name="affectedRegions" value={formData.affectedRegions} onChange={handleInputChange} />
+        </div>
+
+        <div className="form-group">
+          <label>7. Are high-priority users (e.g., VIPs or executives) impacted?</label>
+          <input type="checkbox" name="highPriorityUsers" checked={formData.highPriorityUsers} onChange={handleInputChange} />
+          {formData.highPriorityUsers && (
             <textarea
-              name="impactedSystem"
-              value={formData.impactedSystem}
+              name="highPriorityUserDetails"
+              value={formData.highPriorityUserDetails}
               onChange={handleInputChange}
-              required
+              placeholder="List affected VIP users or roles"
               rows="2"
             />
-          </div>
-
-          <div className="form-group">
-            <label>2. What is the impact to users or the business due to this issue? *</label>
-            <textarea
-              name="businessImpact"
-              value={formData.businessImpact}
-              onChange={handleInputChange}
-              required
-              rows="3"
-              placeholder="e.g., We have no access. Customers are calling saying they are unable to send us emails"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>3. Is the impact worsening over time?</label>
-            <input
-              type="checkbox"
-              name="impactWorsening"
-              checked={formData.impactWorsening}
-              onChange={handleInputChange}
-            />
-            <span>Yes, the impact is getting worse</span>
-          </div>
-
-          <div className="form-group">
-            <label>4. How many users are affected by the issue?</label>
-            <div>
-              <label>Internal Users:</label>
-              <input
-                type="number"
-                name="internalUsersAffected"
-                value={formData.internalUsersAffected}
-                onChange={handleInputChange}
-                min="0"
-              />
-            </div>
-            <div>
-              <label>External Users:</label>
-              <input
-                type="number"
-                name="externalUsersAffected"
-                value={formData.externalUsersAffected}
-                onChange={handleInputChange}
-                min="0"
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>5. What type of users are impacted?</label>
-            {userTypeOptions.map(type => (
-              <div key={type}>
-                <input
-                  type="checkbox"
-                  value={type}
-                  checked={formData.userTypes.includes(type)}
-                  onChange={handleUserTypeChange}
-                />
-                <span>{type}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="form-group">
-            <label>6. Is there any direct or indirect financial/legal impact to Wiley because of the issue?</label>
-            <div>
-              <input
-                type="checkbox"
-                name="financialImpact"
-                checked={formData.financialImpact}
-                onChange={handleInputChange}
-              />
-              <span>Financial Impact</span>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                name="legalImpact"
-                checked={formData.legalImpact}
-                onChange={handleInputChange}
-              />
-              <span>Legal Impact</span>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>7. Are any VIP users affected?</label>
-            <input
-              type="checkbox"
-              name="vipUsersAffected"
-              checked={formData.vipUsersAffected}
-              onChange={handleInputChange}
-            />
-            <span>Yes, VIP users are affected</span>
-            {formData.vipUsersAffected && (
-              <textarea
-                name="vipDetails"
-                value={formData.vipDetails}
-                onChange={handleInputChange}
-                placeholder="Please specify which VIP users are affected"
-                rows="2"
-              />
-            )}
-          </div>
-
-          <div className="form-group">
-            <label>Is it time-sensitive?</label>
-            <input
-              type="checkbox"
-              name="timeSensitive"
-              checked={formData.timeSensitive}
-              onChange={handleInputChange}
-            />
-            <span>Yes, this is time-sensitive</span>
-          </div>
-
-          <div className="form-group">
-            <label>Any known workarounds?</label>
-            <textarea
-              name="workarounds"
-              value={formData.workarounds}
-              onChange={handleInputChange}
-              rows="3"
-              placeholder="Describe any known workarounds or temporary solutions"
-            />
-          </div>
-        </div>
-
-        {/* Additional Details */}
-        <div className="form-section">
-          <h3>Additional Details</h3>
-          <div className="form-group">
-            <label>Additional Description</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows="4"
-              placeholder="Any additional information about the incident"
-            />
-          </div>
-        </div>
-
-        {/* Priority Calculation */}
-        <div className="form-section">
-          <button type="button" onClick={calculatePriority} className="calculate-priority-btn">
-            Calculate Priority
-          </button>
-          {showPriorityExplanation && (
-            <div className={`priority-result priority-${calculatedPriority}`}>
-              {showPriorityExplanation}
-            </div>
           )}
         </div>
 
+        <div className="form-group">
+          <label>8. When did the issue start?</label>
+          <input type="datetime-local" name="issueStartTime" value={formData.issueStartTime} onChange={handleInputChange} />
+        </div>
+
+        <div className="form-group">
+          <label>9. What is the current status (e.g., full outage, degraded, intermittent)?</label>
+          <input type="text" name="currentStatus" value={formData.currentStatus} onChange={handleInputChange} />
+        </div>
+
+        <div className="form-group">
+          <label>10. Are there any known workarounds or temporary solutions available?</label>
+          <textarea name="workaround" value={formData.workaround} onChange={handleInputChange} rows="2" />
+        </div>
+
+        <div className="form-group">
+          <label>11. Are other systems, integrations, or services at risk due to this issue?</label>
+          <textarea name="riskToOtherSystems" value={formData.riskToOtherSystems} onChange={handleInputChange} rows="2" />
+        </div>
+
+        <div className="form-group">
+          <label>12. Is there any risk of data loss, corruption, or integrity compromise?</label>
+          <textarea name="dataImpact" value={formData.dataImpact} onChange={handleInputChange} rows="2" />
+        </div>
+
+        <div className="form-group">
+          <label>13. Is this incident related to a recent change (e.g., deployment, patch, config update)?</label>
+          <textarea name="relatedToChange" value={formData.relatedToChange} onChange={handleInputChange} rows="2" />
+        </div>
+
+        <div className="form-group">
+          <label>14. Has this issue occurred before, or is it a known/recurring problem?</label>
+          <textarea name="recurringIssue" value={formData.recurringIssue} onChange={handleInputChange} rows="2" />
+        </div>
+
+        <div className="form-group">
+          <label>15. What is the estimated time to resolution (ETR)?</label>
+          <input type="text" name="estimatedResolutionTime" value={formData.estimatedResolutionTime} onChange={handleInputChange} />
+        </div>
+
+        <div className="form-group">
+          <label>16. Who needs to be notified (e.g., product owners, compliance, support)?</label>
+          <textarea name="stakeholderNotification" value={formData.stakeholderNotification} onChange={handleInputChange} rows="2" />
+        </div>
+
         <div className="form-actions">
-          <button type="submit">Report Incident</button>
+          <button type="submit">Submit Incident Report</button>
           <button type="button" onClick={() => navigate('/')}>Cancel</button>
         </div>
       </form>
