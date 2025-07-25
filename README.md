@@ -33,6 +33,12 @@ On EC2:
 CI: Automatically builds and stores app images when you update your code.
 
 CD: Automatically deploys those images to your server to run the app.
+
+Deploys the containers by running:
+
+                    docker-compose pull
+
+                    docker-compose up -d 
 _________________________________________________________________________
 
 **Structure**
