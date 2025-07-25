@@ -116,12 +116,12 @@ const IncidentReport = () => {
         </div>
 
         <div className="form-group">
-          <label>14. Has this issue occurred before, or is it a known/recurring problem?</label>
+          <label>13. Has this issue occurred before, or is it a known/recurring problem?</label>
           <textarea name="recurringIssue" value={formData.recurringIssue} onChange={handleInputChange} rows="2" />
         </div>
 
         <div className="form-group">
-          <label>16. Who needs to be notified (e.g., product owners, compliance, support)?</label>
+          <label>14. Who needs to be notified (e.g., product owners, compliance, support)?</label>
           <textarea name="stakeholderNotification" value={formData.stakeholderNotification} onChange={handleInputChange} rows="2" />
         </div>
 
