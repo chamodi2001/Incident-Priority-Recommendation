@@ -30,9 +30,9 @@ On EC2:
   - mysql container already running (docker-compose)
   - backend and frontend pull images from GitLab registry
 
-CI: Automatically builds and stores app images when you update your code.
+CI: Automatically builds and stores app images when update the code.
 
-CD: Automatically deploys those images to your server to run the app.
+CD: Automatically deploys those images to the server to run the app.
 
 Deploys the containers by running:
 
