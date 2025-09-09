@@ -23,7 +23,7 @@ router.post('/', (req, res) => {
     recurringIssue,
     estimatedResolutionTime,
     stakeholderNotification,
-    severity // Make sure your form includes this field!
+    severity
   } = req.body;
 
   const sql = `

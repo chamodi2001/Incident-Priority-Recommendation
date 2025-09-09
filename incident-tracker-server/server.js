@@ -12,15 +12,30 @@ app.use(express.json());
 // Database initialization - Create tables if they don't exist
 const initializeDatabase = () => {
   console.log('Initializing database tables...');
-  
+
   // Create incidents table matching your routes
   const createIncidentsTable = `
     CREATE TABLE IF NOT EXISTS incidents (
       id INT AUTO_INCREMENT PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
-      severity ENUM('low', 'medium', 'high', 'critical') NOT NULL,
-      description TEXT,
       service VARCHAR(255),
+      impactedSystem TEXT,
+      description TEXT,
+      affectedUsers VARCHAR(255),
+      affectedRegions VARCHAR(255),
+      highPriorityUsers TINYINT(1),
+      highPriorityUserDetails TEXT,
+      businessImpact TEXT,
+      issueStartTime DATETIME,
+      currentStatus VARCHAR(255),
+      workaround TEXT,
+      riskToOtherSystems TEXT,
+      dataImpact TEXT,
+      relatedToChange TEXT,
+      recurringIssue TEXT,
+      estimatedResolutionTime VARCHAR(255),
+      stakeholderNotification TEXT,
+      severity ENUM('low', 'medium', 'high', 'critical') NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
@@ -37,11 +52,11 @@ const initializeDatabase = () => {
 
   // Insert sample data (optional)
   const insertSampleData = `
-    INSERT IGNORE INTO incidents (title, severity, description, service) VALUES
-    ('Database Connection Error', 'critical', 'Unable to connect to main database server', 'Database'),
-    ('API Response Slow', 'high', 'API endpoints responding slower than usual', 'API Gateway'),
-    ('UI Loading Issue', 'medium', 'Dashboard takes long time to load', 'Frontend'),
-    ('Email Service Down', 'low', 'Email notifications not being sent', 'Email Service')
+    INSERT IGNORE INTO incidents (title, service, impactedSystem, description, affectedUsers, affectedRegions, highPriorityUsers, highPriorityUserDetails, businessImpact, issueStartTime, currentStatus, workaround, riskToOtherSystems, dataImpact, relatedToChange, recurringIssue, estimatedResolutionTime, stakeholderNotification, severity) VALUES
+    ('Database Connection Error', 'Database', 'Main DB Server', 'Unable to connect to main database server', 'All users', 'Global', 0, '', 'Critical business impact', '2025-09-09 10:00:00', 'Full outage', '', '', '', '', '', '', '', 'critical'),
+    ('API Response Slow', 'API Gateway', 'API Layer', 'API endpoints responding slower than usual', 'Developers', 'US', 0, '', 'Moderate impact', '2025-09-08 09:00:00', 'Degraded', '', '', '', '', '', '', '', 'high'),
+    ('UI Loading Issue', 'Frontend', 'Dashboard', 'Dashboard takes long time to load', 'End users', 'EU', 0, '', 'Minor inconvenience', '2025-09-07 08:00:00', 'Intermittent', '', '', '', '', '', '', '', 'medium'),
+    ('Email Service Down', 'Email Service', 'Email System', 'Email notifications not being sent', 'Support', 'Asia', 0, '', 'Low impact', '2025-09-06 07:00:00', 'Full outage', '', '', '', '', '', '', '', 'low')
   `;
 
   db.query(insertSampleData, (err, result) => {
