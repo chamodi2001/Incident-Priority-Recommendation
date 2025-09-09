@@ -32,16 +32,14 @@ jobs:
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          
-          # key: ${{ secrets.EC2_SSH_KEY }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-          
-          envs: GITLAB_TOKEN,HUB_TOKEN
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: GITLAB_TOKEN,HUB_TOKEN,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_DEFAULT_REGION
           script: |
             cd /home/ec2-user
 
@@ -51,6 +49,11 @@ jobs:
 
             echo "Logging into GitLab Container Registry..."
             echo "$GITLAB_TOKEN" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
+
+            echo "Setting AWS credentials for this session..."
+            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+            export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 
             if [ -d "IncidentTracker" ]; then
               echo "Directory exists. Pulling latest changes..."
@@ -68,7 +71,6 @@ jobs:
 
             echo "Restarting Docker containers..."
             docker-compose down
-            # docker-compose up -d
             docker-compose up -d --build
 
             echo "Checking container status..."
