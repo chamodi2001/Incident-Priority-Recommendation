@@ -39,6 +39,7 @@ jobs:
           # key: ${{ secrets.EC2_SSH_KEY }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
           
           envs: GITLAB_TOKEN,HUB_TOKEN
           script: |
