@@ -1,20 +1,18 @@
 const express = require('express');
-const { Configuration, OpenAIApi } = require('openai');
 const dotenv = require('dotenv');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 dotenv.config();
 const app = express();
 app.use(express.json());
 
-const openai = new OpenAIApi(new Configuration({
-  apiKey: process.env.OPENAI_API_KEY
-}));
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post('/api/priority', async (req, res) => {
   const data = req.body;
 
   const prompt = `
-You are an incident triage assistant. Based on the following incident report, assign a priority level: High, Medium, or Low.
+You are an incident triage assistant. Based on the following report, assign a priority level: High, Medium, or Low.
 
 1. Title: ${data.title}
 2. Service/Application Affected: ${data.service}
@@ -35,15 +33,12 @@ Respond with only the priority level.
 `;
 
   try {
-    const response = await openai.createChatCompletion({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: prompt }]
-    });
-
-    const priority = response.data.choices[0].message.content.trim();
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const result = await model.generateContent(prompt);
+    const priority = result.response.text().trim();
     res.json({ priority });
   } catch (err) {
-    console.error('OpenAI Error:', err);
+    console.error('Gemini API Error:', err);
     res.status(500).json({ error: 'Failed to get priority recommendation' });
   }
 });
