@@ -1,33 +1,30 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
-const IncidentReport = () => {
-  const navigate = useNavigate();
+function IncidentForm() {
   const [formData, setFormData] = useState({
     title: '',
     service: '',
     impactedSystem: '',
-    description: '',
+    businessImpact: '',
     affectedUsers: '',
-    affectedRegions: '',
     highPriorityUsers: false,
     highPriorityUserDetails: '',
-    businessImpact: '',
     issueStartTime: '',
     currentStatus: '',
     workaround: '',
     riskToOtherSystems: '',
     dataImpact: '',
-    relatedToChange: '',
     recurringIssue: '',
-    estimatedResolutionTime: '',
-    stakeholderNotification: '',
+    stakeholderNotification: ''
   });
+
+  const [priority, setPriority] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
@@ -35,14 +32,29 @@ const IncidentReport = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setPriority('');
+    setError('');
 
     try {
-      await axios.post('http://localhost:5000/api/incidents', formData);
-      alert('Incident reported successfully!');
-      navigate('/');
-    } catch (error) {
-      console.error('Error reporting incident:', error);
-      alert('Error reporting incident. Please try again.');
+      const res = await fetch('/api/priority', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setPriority(data.priority);
+      } else {
+        setError(data.error || 'Something went wrong');
+      }
+    } catch (err) {
+      console.error('Frontend Error:', err);
+      setError('Network error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,7 +86,6 @@ const IncidentReport = () => {
           <label>5. Who is affected (e.g., internal staff, customers)? Please specify approximate count:</label>
           <input type="text" name="affectedUsers" value={formData.affectedUsers} onChange={handleInputChange} />
         </div>
-
 
         <div className="form-group">
           <label>7. Are high-priority users (e.g., VIPs or executives) impacted?</label>
@@ -125,13 +136,24 @@ const IncidentReport = () => {
           <textarea name="stakeholderNotification" value={formData.stakeholderNotification} onChange={handleInputChange} rows="2" />
         </div>
 
-        <div className="form-actions">
-          <button type="submit">Submit Incident Report</button>
-          <button type="button" onClick={() => navigate('/')}>Cancel</button>
-        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Submitting...' : 'Submit'}
+        </button>
       </form>
+
+      {priority && (
+        <p style={{ marginTop: '1rem', color: 'green' }}>
+           Recommended Priority: <strong>{priority}</strong>
+        </p>
+      )}
+
+      {error && (
+        <p style={{ marginTop: '1rem', color: 'red' }}>
+           {error}
+        </p>
+      )}
     </div>
   );
-};
+}
 
-export default IncidentReport;
+export default IncidentForm;
