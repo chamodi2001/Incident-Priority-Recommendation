@@ -12,6 +12,10 @@ jobs:
     steps:
       - name: Checkout GitHub Repository
         uses: actions/checkout@v3
+         ##########
+      - name: Inject Gemini API Key into .env
+        run: echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> ./incident-tracker-server/.env
+         ##########
 
       - name: Log in to GitLab Container Registry
         run: |
