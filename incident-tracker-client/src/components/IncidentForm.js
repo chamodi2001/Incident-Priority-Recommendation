@@ -37,7 +37,7 @@ function IncidentForm() {
     setError('');
 
     try {
-      const res = await fetch('/api/priority', {
+      const res = await fetch('https://inctrack.space/api/priority', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
