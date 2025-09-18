@@ -38,7 +38,7 @@ Respond with only the priority level.
     const priority = result.response.text().trim();
     res.json({ priority });
   } catch (err) {
-    console.error('Gemini API Error:', err);
+    console.error('Gemini API Error:', err.response?.data || err.message || err);
     res.status(500).json({ error: 'Failed to get priority recommendation' });
   }
 });
