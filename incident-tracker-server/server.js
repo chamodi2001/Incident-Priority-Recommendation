@@ -2,6 +2,9 @@ const express = require('express');
 const dotenv = require('dotenv');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+const cors = require('cors');
+app.use(cors());
+
 dotenv.config();
 const app = express();
 app.use(express.json());
