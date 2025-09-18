@@ -15,7 +15,6 @@ jobs:
          ##########
       - name: Inject Gemini API Key into .env
         run: echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> ./incident-tracker-server/.env
-         console.log('Gemini API Key:', process.env.GEMINI_API_KEY);
          ##########
 
       - name: Log in to GitLab Container Registry
