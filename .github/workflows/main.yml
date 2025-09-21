@@ -105,7 +105,18 @@ jobs:
             echo "===== Issuing SSL certificate ====="
             sudo certbot --nginx -d inctrack.space -d www.inctrack.space --non-interactive --agree-tos -m chamodigunathilaka2018@gmail.com
             sudo certbot renew --dry-run
+
+
             #############################################
+             echo "===== Installing Terraform on Amazon linux ====="
+             echo "===== Checking Terraform ====="
+             if ! command -v terraform >/dev/null 2>&1; then
+              sudo yum install -y yum-utils shadow-utils
+              sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+              sudo yum install terraform
+            fi
+            #############################################
+
 
             echo "===== Deploying Docker containers ====="
             cd /home/ec2-user
