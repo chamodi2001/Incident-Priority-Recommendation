@@ -116,7 +116,11 @@ jobs:
               sudo yum install terraform
             fi
             #############################################
-
+             echo "===== Checking Amazon-cloudwatch-agent ====="
+            if ! command -v amazon-cloudwatch-agent >/dev/null 2>&1; then
+              sudo yum install -y amazon-cloudwatch-agent
+            fi
+            ##############################
 
             echo "===== Deploying Docker containers ====="
             cd /home/ec2-user
