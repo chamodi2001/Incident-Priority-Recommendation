@@ -127,18 +127,6 @@ jobs:
             fi
             ##############################
 
-
-            echo "===== Deploying Docker containers ====="
-            cd /home/ec2-user
-            if [ -d "IncidentTracker" ]; then
-              cd IncidentTracker
-              git checkout main
-              git pull origin main
-            else
-              git clone --branch main https://$HUB_TOKEN@github.com/chamodi2001/IncidentTracker.git
-              cd IncidentTracker
-            fi
-
             #--------------------------#
             echo "===== Running Terraform inside EC2 ====="
             cd /home/ec2-user/IncidentTracker/terraform_disk_monitoring
@@ -150,6 +138,19 @@ jobs:
                             -var="alarm_email=${ALARM_EMAIL}" \
                             -var="aws_region=${AWS_REGION}" -auto-approve
 
+            #--------------------##   
+
+            
+            echo "===== Deploying Docker containers ====="
+            cd /home/ec2-user
+            if [ -d "IncidentTracker" ]; then
+              cd IncidentTracker
+              git checkout main
+              git pull origin main
+            else
+              git clone --branch main https://$HUB_TOKEN@github.com/chamodi2001/IncidentTracker.git
+              cd IncidentTracker
+            fi
                             
             docker-compose down
             # docker image prune -af   # remove all unused/dangling images safely 
