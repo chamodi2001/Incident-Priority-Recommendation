@@ -139,7 +139,7 @@ jobs:
             fi
 
             docker-compose down
-            docker image prune -af   # remove all unused/dangling images safely 
+            # docker image prune -af   # remove all unused/dangling images safely 
             docker-compose pull
             docker-compose up -d --build
             docker-compose ps
