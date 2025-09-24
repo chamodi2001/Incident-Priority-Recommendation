@@ -127,18 +127,18 @@ jobs:
             fi
             ##############################
 
-            # #--------------------------#
-            # echo "===== Running Terraform inside EC2 ====="
-            # cd /home/ec2-user/IncidentTracker/terraform_disk_monitoring
-            # terraform init
-            # terraform plan -var="instance_id=${INSTANCE_ID}" \
-            #                -var="alarm_email=${ALARM_EMAIL}" \
-            #                -var="aws_region=${AWS_REGION}"
-            # terraform apply -var="instance_id=${INSTANCE_ID}" \
-            #                 -var="alarm_email=${ALARM_EMAIL}" \
-            #                 -var="aws_region=${AWS_REGION}" -auto-approve
+            #--------------------------#
+            echo "===== Running Terraform inside EC2 ====="
+            cd /home/ec2-user/IncidentTracker/terraform_disk_monitoring
+            terraform init
+            terraform plan -var="instance_id=${INSTANCE_ID}" \
+                           -var="alarm_email=${ALARM_EMAIL}" \
+                           -var="aws_region=${AWS_REGION}"
+            terraform apply -var="instance_id=${INSTANCE_ID}" \
+                            -var="alarm_email=${ALARM_EMAIL}" \
+                            -var="aws_region=${AWS_REGION}" -auto-approve
 
-            # #--------------------##   
+            #--------------------##   
 
             
             echo "===== Deploying Docker containers ====="
