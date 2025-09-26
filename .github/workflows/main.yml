@@ -126,8 +126,6 @@ jobs:
 
             fi
             ##############################
-            #checking whether credentials are passed
-            aws sts get-caller-identity
 
             #--------------------------#
             echo "===== Running Terraform inside EC2 ====="
