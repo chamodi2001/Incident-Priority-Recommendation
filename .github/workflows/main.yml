@@ -44,7 +44,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: GITLAB_TOKEN,HUB_TOKEN
+          envs: GITLAB_TOKEN,HUB_TOKEN,INSTANCE_ID,ALARM_EMAIL,AWS_REGION
           script: |
             echo "===== Checking Docker & Docker Compose ====="
             if ! command -v docker >/dev/null 2>&1; then
@@ -144,19 +144,18 @@ jobs:
 
             ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "bash -l -c '
             cd /home/ec2-user/IncidentTracker/terraform_disk_monitoring &&
-            echo \"Using instance_id=$INSTANCE_ID, alarm_email=$ALARM_EMAIL, region=$AWS_REGION\" &&
-            terraform init &&
+            echo "checking getting values from variables region=$AWS_REGION"
+
+            terraform init
             terraform plan \
-              -var=\"instance_id=$INSTANCE_ID\" \
-              -var=\"alarm_email=$ALARM_EMAIL\" \
-              -var=\"aws_region=$AWS_REGION\" &&
+            -var="instance_id=$INSTANCE_ID" \
+            -var="alarm_email=$ALARM_EMAIL" \
+            -var="aws_region=$AWS_REGION"
+
             terraform apply -auto-approve \
-              -var=\"instance_id=$INSTANCE_ID\" \
-              -var=\"alarm_email=$ALARM_EMAIL\" \
-              -var=\"aws_region=$AWS_REGION\"
-              '"
-            #test whether the screatcs are reachings your EC2 session. 
-            echo "Region: $AWS_REGION"
+            -var="instance_id=$INSTANCE_ID" \
+            -var="alarm_email=$ALARM_EMAIL" \
+            -var="aws_region=$AWS_REGION"
             #--------------------##   
             
             
