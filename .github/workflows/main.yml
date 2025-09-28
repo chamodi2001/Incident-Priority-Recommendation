@@ -167,6 +167,7 @@ jobs:
             #--------------------##
             echo "===== Deploying Docker containers ====="  
             cd  /home/ec2-user/IncidentTracker
+            echo "GEMINI_API_KEY=$GEMINI_API_KEY" > .env
             docker-compose down
             docker image prune -af   # remove all unused/dangling images safely 
             # docker system prune -af --volumes : Remove unused containers, networks, images, build cache
