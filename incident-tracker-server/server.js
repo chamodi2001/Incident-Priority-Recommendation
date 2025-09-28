@@ -1,23 +1,36 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 const cors = require('cors');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Load environment variables (make sure .env path is correct)
+// Explicitly point dotenv to the correct folder if .env is in 'incident-tracker-server'
 dotenv.config({ path: './incident-tracker-server/.env' });
 
-console.log('Gemini API Key:', process.env.GEMINI_API_KEY ? 'Loaded ✅' : 'Missing ❌');
+// Check API key early
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  console.error('ERROR: GEMINI_API_KEY not defined. Did dotenv load correctly?');
+}
 
-// Initialize app
+console.log('Gemini API Key loaded:', apiKey ? 'Yes' : 'No');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Initialize Gemini client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+let genAI = null;
+if (apiKey) {
+  genAI = new GoogleGenerativeAI(apiKey);
+}
 
 app.post('/api/priority', async (req, res) => {
+  if (!genAI) {
+    return res.status(500).json({ error: 'Gemini API key not configured' });
+  }
+
   const data = req.body;
+  // You may want to validate that required fields exist in data
+  // Eg: if (!data.title) return res.status(400).json({error: "Missing field title"})
 
   const prompt = `
 You are an incident triage assistant. Based on the following report, assign a priority level: High, Medium, or Low.
@@ -44,21 +57,25 @@ Respond with only the priority level.
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     const result = await model.generateContent(prompt);
 
-    // Safer parsing of Gemini response
-    const priority = result.response.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    // Safer parsing of result
+    const priority = result
+      .response
+      ?.candidates?.[0]
+      ?.content?.parts?.[0]?.text
+      ?.trim();
 
     if (!priority) {
-      throw new Error("Gemini didn't return a priority value");
+      console.error('No priority returned. Full result:', JSON.stringify(result, null, 2));
+      throw new Error('Invalid Gemini response structure or no text returned');
     }
 
-    res.json({ priority });
+    return res.json({ priority });
   } catch (err) {
-    console.error('Gemini API Error:', err.response?.data || err.message || err);
-    res.status(500).json({ error: 'Failed to get priority recommendation' });
+    console.error('Gemini API Error:', err?.response?.data || err.message || err);
+    return res.status(500).json({ error: 'Failed to get priority recommendation' });
   }
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
