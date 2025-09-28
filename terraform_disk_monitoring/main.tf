@@ -13,7 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_usage" {
   alarm_description   = "Alarm when root (/) disk usage exceeds 75% on ${var.instance_id}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
-  period              = 1800           #  seconds/30mins
+  period              = 1800           #  seconds/30min
   statistic           = "Average"     # or "Maximum" if you want spike-sensitive
   threshold           = 98
   namespace           = "CWAgent"
@@ -32,4 +32,5 @@ resource "aws_cloudwatch_metric_alarm" "disk_usage" {
     aws_sns_topic.disk_alerts.arn
   ]
 }
+
 
