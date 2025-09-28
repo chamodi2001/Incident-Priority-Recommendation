@@ -39,12 +39,13 @@ jobs:
           INSTANCE_ID: ${{ secrets.INSTANCE_ID }}
           ALARM_EMAIL: ${{ secrets.ALARM_EMAIL }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: GITLAB_TOKEN,HUB_TOKEN,INSTANCE_ID,ALARM_EMAIL,AWS_REGION
+          envs: GITLAB_TOKEN,HUB_TOKEN,INSTANCE_ID,ALARM_EMAIL,AWS_REGION,GEMINI_API_KEY
           script: |
             echo "===== Checking Docker & Docker Compose ====="
             if ! command -v docker >/dev/null 2>&1; then
@@ -136,7 +137,7 @@ jobs:
             if [ -d "IncidentTracker" ]; then
               #if the directory exists
               cd IncidentTracker
-              # pwd git checkout main #git pull origin main
+              # git checkout main #git pull origin main
               git fetch origin main
               git reset --hard origin/main  
             else
