@@ -9,8 +9,9 @@ services:
       MYSQL_DATABASE: incident_trackerdb
     ports:
       - "3306:3306"
-    # networks:
-    #   - incident_net
+    networks:
+      - incident_net
+
 
   backend:
     image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
@@ -35,8 +36,8 @@ services:
       - backend
     networks:
       - incident_net
-    environment:
-    - REACT_APP_API_URL=http://backend:5000
+    # environment:
+    # - REACT_APP_API_URL=http://backend:5000
     
 networks:
   incident_net:
