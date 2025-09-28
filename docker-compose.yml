@@ -19,6 +19,7 @@ services:
       DB_USER: root
       DB_PASSWORD: rootpass
       DB_NAME: incident_trackerdb
+      GEMINI_API_KEY: ${GEMINI_API_KEY}   # added for gemini authentication
     depends_on:
       - mysql
     ports:
