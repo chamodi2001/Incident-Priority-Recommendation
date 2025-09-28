@@ -165,6 +165,7 @@ jobs:
                             
             docker-compose down
             docker image prune -af   # remove all unused/dangling images safely 
+            # docker system prune -af --volumes : Remove unused containers, networks, images, build cache
             docker-compose pull
             docker-compose up -d --build
             docker-compose ps
