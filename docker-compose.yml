@@ -9,8 +9,8 @@ services:
       MYSQL_DATABASE: incident_trackerdb
     ports:
       - "3306:3306"
-    networks:
-      - incident_net
+    # networks:
+    #   - incident_net
 
   backend:
     image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
