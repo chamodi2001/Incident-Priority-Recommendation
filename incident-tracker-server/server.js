@@ -1,18 +1,18 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GOOGLE_API_KEY } = require('@google/generative-ai');
 
 // Load environment variables from .env in the same folder
 dotenv.config();
 
 // Check API key early
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GOOGLE_API_KEY;
 if (!apiKey) {
-  console.error('ERROR: GEMINI_API_KEY not defined. Did dotenv load correctly?');
+  console.error('ERROR: GOOGLE_API_KEY not defined. Did dotenv load correctly?');
 }
 
-console.log('Gemini API Key loaded:', apiKey ? 'Yes' : 'No');
+console.log('GOOGLE API KEY  loaded:', apiKey ? 'Yes' : 'No');
 
 const app = express();
 app.use(cors());
