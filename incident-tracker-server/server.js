@@ -3,8 +3,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Explicitly point dotenv to the correct folder if .env is in 'incident-tracker-server'
-dotenv.config({ path: './incident-tracker-server/.env' });
+// Load environment variables from .env in the same folder
+dotenv.config();
 
 // Check API key early
 const apiKey = process.env.GEMINI_API_KEY;
@@ -23,14 +23,13 @@ if (apiKey) {
   genAI = new GoogleGenerativeAI(apiKey);
 }
 
-app.post('/api/priority', async (req, res) => {
+// Notice: no `/api` prefix here
+app.post('/priority', async (req, res) => {
   if (!genAI) {
     return res.status(500).json({ error: 'Gemini API key not configured' });
   }
 
   const data = req.body;
-  // You may want to validate that required fields exist in data
-  // Eg: if (!data.title) return res.status(400).json({error: "Missing field title"})
 
   const prompt = `
 You are an incident triage assistant. Based on the following report, assign a priority level: High, Medium, or Low.
@@ -57,16 +56,12 @@ Respond with only the priority level.
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     const result = await model.generateContent(prompt);
 
-    // Safer parsing of result
-    const priority = result
-      .response
-      ?.candidates?.[0]
-      ?.content?.parts?.[0]?.text
-      ?.trim();
+    // More robust parsing
+    const priority = result.response.text().trim();
 
     if (!priority) {
       console.error('No priority returned. Full result:', JSON.stringify(result, null, 2));
-      throw new Error('Invalid Gemini response structure or no text returned');
+      throw new Error('Invalid Gemini response or empty text');
     }
 
     return res.json({ priority });
