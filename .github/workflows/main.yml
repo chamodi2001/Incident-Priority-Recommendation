@@ -78,34 +78,45 @@ jobs:
             sudo tee $NGINX_CONF > /dev/null <<EOF
             # Redirect HTTP to HTTPS
             server {
-            listen 80;
-            server_name inctrack.space www.inctrack.space;
-            return 301 https://\$host\$request_uri;
+                listen 80;
+                server_name inctrack.space www.inctrack.space;
+                return 301 https://\$host\$request_uri;
             }
 
             # HTTPS server block
             server {
-            listen 443 ssl;
-            server_name inctrack.space www.inctrack.space;
+                listen 443 ssl;
+                server_name inctrack.space www.inctrack.space;
 
-            ssl_certificate /etc/letsencrypt/live/inctrack.space/fullchain.pem;
-            ssl_certificate_key /etc/letsencrypt/live/inctrack.space/privkey.pem;
-            include /etc/letsencrypt/options-ssl-nginx.conf;
-            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+                ssl_certificate /etc/letsencrypt/live/inctrack.space/fullchain.pem;
+                ssl_certificate_key /etc/letsencrypt/live/inctrack.space/privkey.pem;
+                include /etc/letsencrypt/options-ssl-nginx.conf;
+                ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-            location / {
-                proxy_pass http://127.0.0.1:3000;
-                proxy_set_header Host \$host;
-                proxy_set_header X-Real-IP \$remote_addr;
-                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Proto \$scheme;
-            }
-            
+                # Frontend (React app)
+                location / {
+                    proxy_pass http://127.0.0.1:3000;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                }
+
+               # Backend (Express/Node app)
+                location /api/ {
+                    proxy_pass http://127.0.0.1:5000;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                }
             }
             EOF
 
             sudo nginx -t
             sudo systemctl reload nginx
+
 
             echo "===== Issuing SSL certificate ====="
             sudo certbot --nginx -d inctrack.space -d www.inctrack.space --non-interactive --agree-tos -m chamodigunathilaka2018@gmail.com
