@@ -1,4 +1,4 @@
-name: Build and Deploy Incident Tracker
+name: Build and Deploy Incident Tracker QAnew
 
 on:
   push:
