@@ -1,9 +1,9 @@
-name: Build and Deploy Incident Tracker QAnew
+name: Build and Deploy Incident Tracker main
 
 on:
   push:
     branches:
-      - QAnew
+      - main
 
 jobs:
   build-and-deploy:
@@ -25,13 +25,8 @@ jobs:
 
       - name: Build and Push Frontend Image
         run: |
-          # Build frontend with empty REACT_APP_API_BASE_URL so the production bundle
-          # uses relative API paths (e.g. /api/priority) which will be proxied by nginx.
           docker build --build-arg REACT_APP_API_BASE_URL= -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./incident-tracker-client
           docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
-          # If you ever want to bake a specific API base into the build (not recommended
-          # for production behind nginx), set REACT_APP_API_BASE_URL to a value, e.g.: 
-          # docker build --build-arg REACT_APP_API_BASE_URL=http://backend:5000 -t ... ./incident-tracker-client
 
       - name: SSH into EC2 and Deploy
         uses: appleboy/ssh-action@master
