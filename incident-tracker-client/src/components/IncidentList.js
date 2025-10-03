@@ -6,7 +6,9 @@ const IncidentList = () => {
   const [incidents, setIncidents] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/incidents')
+    // Use a relative path so the browser requests /api/incidents which will be
+    // proxied by the server/nginx (works in production behind the reverse proxy)
+    axios.get('/api/incidents')
       .then(res => setIncidents(res.data))
       .catch(err => console.error(err));
   }, []);

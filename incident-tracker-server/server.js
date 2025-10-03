@@ -1,77 +1,44 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
-const { GOOGLE_API_KEY } = require('@google/generative-ai');
+const dotenv = require('dotenv');
 
-// Load environment variables from .env in the same folder
 dotenv.config();
-
-// Check API key early
-const apiKey = process.env.GOOGLE_API_KEY;
-if (!apiKey) {
-  console.error('ERROR: GOOGLE_API_KEY not defined. Did dotenv load correctly?');
-}
-
-console.log('GOOGLE API KEY  loaded:', apiKey ? 'Yes' : 'No');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-let genAI = null;
-if (apiKey) {
-  genAI = new GoogleGenerativeAI(apiKey);
-}
+// Deterministic priority mapping endpoint.
+// Expects JSON body: { impact: 'high'|'low', urgency: 'high'|'low' }
+app.post('/api/priority', (req, res) => {
+  const { impact, urgency } = req.body || {};
 
-// Notice: no `/api` prefix here
-app.post('/priority', async (req, res) => {
-  if (!genAI) {
-    return res.status(500).json({ error: 'Gemini API key not configured' });
+  if (!impact || !urgency) {
+    return res.status(400).json({ error: 'impact and urgency are required' });
   }
 
-  const data = req.body;
+  let priority = '';
+  if (impact === 'high' && urgency === 'high') priority = 'P1';
+  else if (impact === 'high' && urgency === 'low') priority = 'P2';
+  else if (impact === 'low' && urgency === 'high') priority = 'P3';
+  else if (impact === 'low' && urgency === 'low') priority = 'P4';
+  else priority = 'P4';
 
-  const prompt = `
-You are an incident triage assistant. Based on the following report, assign a priority level: High, Medium, or Low.
+  res.json({ priority });
+});
 
-1. Title: ${data.title}
-2. Service/Application Affected: ${data.service}
-3. Impacted System: ${data.impactedSystem}
-4. Business Impact: ${data.businessImpact}
-5. Affected Users: ${data.affectedUsers}
-6. High-Priority Users Impacted: ${data.highPriorityUsers ? 'Yes' : 'No'}
-7. VIP Details: ${data.highPriorityUserDetails}
-8. Issue Start Time: ${data.issueStartTime}
-9. Current Status: ${data.currentStatus}
-10. Workaround Available: ${data.workaround}
-11. Risk to Other Systems: ${data.riskToOtherSystems}
-12. Data Impact: ${data.dataImpact}
-13. Recurring Issue: ${data.recurringIssue}
-14. Stakeholder Notification: ${data.stakeholderNotification}
-
-Respond with only the priority level.
-`;
-
-  try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-    const result = await model.generateContent(prompt);
-
-    // More robust parsing
-    const priority = result.response.text().trim();
-
-    if (!priority) {
-      console.error('No priority returned. Full result:', JSON.stringify(result, null, 2));
-      throw new Error('Invalid Gemini response or empty text');
-    }
-
-    return res.json({ priority });
-  } catch (err) {
-    console.error('Gemini API Error:', err?.response?.data || err.message || err);
-    return res.status(500).json({ error: 'Failed to get priority recommendation' });
-  }
+// Simple endpoint to return incidents. In production replace with DB query.
+app.get('/api/incidents', (req, res) => {
+  // Return an empty list by default; you can later wire this to MySQL.
+  const sampleIncidents = [
+    // Example object structure used by the client. Keep commented or empty in prod.
+    // { id: 1, title: 'Sample incident', severity: 'High', service: 'Auth', created_at: new Date().toISOString() }
+  ];
+  res.json(sampleIncidents);
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on ${HOST}:${PORT}`);
 });

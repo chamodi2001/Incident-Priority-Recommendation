@@ -7,11 +7,9 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install existing dependencies
-RUN npm install
 
-# Install additional dependencies
-RUN npm install @google/generative-ai dotenv cors
+# Install dependencies
+RUN npm install
 
 # Copy the rest of the application code
 COPY . .
@@ -21,4 +19,3 @@ EXPOSE 5000
 
 # Run the server
 CMD ["node", "server.js"]
-
