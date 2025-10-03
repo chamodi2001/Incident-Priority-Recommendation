@@ -13,9 +13,6 @@ jobs:
       - name: Checkout GitHub Repository
         uses: actions/checkout@v3
          ##########
-      - name: Inject Gemini API Key into .env
-        run: echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> ./incident-tracker-server/.env
-          ##########
 
       - name: Log in to GitLab Container Registry
         run: |
@@ -39,13 +36,11 @@ jobs:
           INSTANCE_ID: ${{ secrets.INSTANCE_ID }}
           ALARM_EMAIL: ${{ secrets.ALARM_EMAIL }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: GITLAB_TOKEN,HUB_TOKEN,INSTANCE_ID,ALARM_EMAIL,AWS_REGION,GOOGLE_API_KEY
+          envs: GITLAB_TOKEN,HUB_TOKEN,INSTANCE_ID,ALARM_EMAIL,AWS_REGION
           script: |
             echo "===== Checking Docker & Docker Compose ====="
             if ! command -v docker >/dev/null 2>&1; then
@@ -178,8 +173,6 @@ jobs:
             #--------------------##
             echo "===== Deploying Docker containers ====="  
             cd  /home/ec2-user/IncidentTracker
-            # echo "GOOGLE_API_KEY=$GOOGLE_API_KEY" > .env
-            export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
             docker-compose down
             docker image prune -af   # remove all unused/dangling images safely 
             # docker system prune -af --volumes : Remove unused containers, networks, images, build cache
