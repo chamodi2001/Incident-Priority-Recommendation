@@ -10,8 +10,8 @@ COPY package*.json ./
 # Install existing dependencies
 RUN npm install
 
-# Install Google Generative AI SDK separately
-RUN npm install @google/generative-ai
+# Install additional dependencies
+RUN npm install @google/generative-ai dotenv cors
 
 # Copy the rest of the application code
 COPY . .
@@ -21,3 +21,4 @@ EXPOSE 5000
 
 # Run the server
 CMD ["node", "server.js"]
+
