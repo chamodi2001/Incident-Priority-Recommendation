@@ -37,7 +37,7 @@ function IncidentForm() {
     setError('');
 
     try {
-  const res = await fetch('https://inctrack.space/priority', {
+      const res = await fetch('https://inctrack.space/api/priority', {
       // const res = await fetch(`${process.env.REACT_APP_API_URL}/api/incidents`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -48,13 +48,6 @@ function IncidentForm() {
 
       if (res.ok) {
         setPriority(data.priority);
-        // Combine form data into a question string
-        const question = Object.entries(formData)
-          .filter(([key, value]) => value && value !== false)
-          .map(([key, value]) => `${key}: ${value}`)
-          .join(' | ');
-        // Redirect to Google Search with the question
-        window.location.href = `https://www.google.com/search?q=${encodeURIComponent(question)}`;
       } else {
         setError(data.error || 'Something went wrong');
       }
