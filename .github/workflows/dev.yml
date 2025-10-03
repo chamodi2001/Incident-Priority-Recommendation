@@ -1,9 +1,9 @@
-name: Build and Deploy Incident Tracker
+name: Build and Deploy Incident Tracker QAnew
 
 on:
   push:
     branches:
-      - main
+      - QAnew
 
 jobs:
   build-and-deploy:
@@ -13,9 +13,6 @@ jobs:
       - name: Checkout GitHub Repository
         uses: actions/checkout@v3
          ##########
-      - name: Inject Gemini API Key into .env
-        run: echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> ./incident-tracker-server/.env
-          ##########
 
       - name: Log in to GitLab Container Registry
         run: |
@@ -28,8 +25,13 @@ jobs:
 
       - name: Build and Push Frontend Image
         run: |
-          docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./incident-tracker-client
+          # Build frontend with empty REACT_APP_API_BASE_URL so the production bundle
+          # uses relative API paths (e.g. /api/priority) which will be proxied by nginx.
+          docker build --build-arg REACT_APP_API_BASE_URL= -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./incident-tracker-client
           docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
+          # If you ever want to bake a specific API base into the build (not recommended
+          # for production behind nginx), set REACT_APP_API_BASE_URL to a value, e.g.: 
+          # docker build --build-arg REACT_APP_API_BASE_URL=http://backend:5000 -t ... ./incident-tracker-client
 
       - name: SSH into EC2 and Deploy
         uses: appleboy/ssh-action@master
@@ -39,13 +41,11 @@ jobs:
           INSTANCE_ID: ${{ secrets.INSTANCE_ID }}
           ALARM_EMAIL: ${{ secrets.ALARM_EMAIL }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: GITLAB_TOKEN,HUB_TOKEN,INSTANCE_ID,ALARM_EMAIL,AWS_REGION,GOOGLE_API_KEY
+          envs: GITLAB_TOKEN,HUB_TOKEN,INSTANCE_ID,ALARM_EMAIL,AWS_REGION
           script: |
             echo "===== Checking Docker & Docker Compose ====="
             if ! command -v docker >/dev/null 2>&1; then
@@ -178,8 +178,6 @@ jobs:
             #--------------------##
             echo "===== Deploying Docker containers ====="  
             cd  /home/ec2-user/IncidentTracker
-            # echo "GOOGLE_API_KEY=$GOOGLE_API_KEY" > .env
-            export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
             docker-compose down
             docker image prune -af   # remove all unused/dangling images safely 
             # docker system prune -af --volumes : Remove unused containers, networks, images, build cache

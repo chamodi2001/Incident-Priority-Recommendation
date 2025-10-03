@@ -1,70 +1,77 @@
-# Getting Started with Create React App
+# IncidentTracker
+Incident Tracker is a lightweight web application which allow users to submit incident reports and receive an estimated priority based on their responses. Future enhancements include integrating AI for smarter priority classification.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+_**Tech Stack**_
 
-## Available Scripts
+**Frontend**:  React.js 
 
-In the project directory, you can run:
+**Backend**:   Node.js , Express js
 
-### `npm start`
+**Docker**:    For containerization
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+**GitHub , GitHub Actions**:   Source control + deploy trigger
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**GitLab**:  CI to build & store image
 
-### `npm test`
+**AWS EC2**: Docker host running the app
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+_________________________________________________________________________
+GitHub repo (Code)
+      |
+GitHub Actions (CI/CD)
 
-### `npm run build`
+ Build backend image (Github Actions) → push to GitLab Container Registry
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+ Build frontend image (Github Actions) → push to GitLab Container Registry
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+ SSH into EC2 → pull images → docker compose up 
+     
+On EC2:
+  - mysql container already running (docker-compose)
+  - backend and frontend pull images from GitLab registry
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+CI: Automatically builds and stores app images when update the code.
 
-### `npm run eject`
+CD: Automatically deploys those images to the server to run the app.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Deploys the containers by running:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+                    docker-compose pull
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+                    docker-compose up -d 
+_________________________________________________________________________
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+**Structure**
+incident-tracker/
 
-## Learn More
+├── frontend/
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+     │   ├── Dockerfile
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+     │   └── ...
 
-### Code Splitting
+├── backend/
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+    │   ├── Dockerfile
 
-### Analyzing the Bundle Size
+    │   └── ...
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+├── docker-compose.yml
 
-### Making a Progressive Web App
+├── .env
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+└── .github/
 
-### Advanced Configuration
+    └── workflows/
+____________________________________________________________________________
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Website Rendering,
 
-### Deployment
+1. Check EC2 Public IP or Domain
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+   Copy the EC2 instance's Public IPv4 address or Public DNS.
 
-### `npm run build` fails to minify
+2. Visit the Site in Your Browser
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+http://<EC2_PUBLIC_IP>:<frontend_port>
+
