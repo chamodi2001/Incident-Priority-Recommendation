@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import './incident-form.css';
 
 function IncidentForm() {
   const [impact, setImpact] = useState('');
@@ -36,67 +37,80 @@ function IncidentForm() {
     <div className="incident-report-form">
       <h2>Incident Priority Recommendation</h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Enter Impact:</label><br />
-          <label>
-            <input
-              type="radio"
-              name="impact"
-              value="high"
-              checked={impact === 'high'}
-              onChange={handleImpactChange}
-              required
-            />
-            High
-          </label>
-          <label style={{ marginLeft: '1rem' }}>
-            <input
-              type="radio"
-              name="impact"
-              value="low"
-              checked={impact === 'low'}
-              onChange={handleImpactChange}
-              required
-            />
-            Low
-          </label>
+        <div className="form-group fieldset" role="group" aria-labelledby="impact-legend">
+          <div className="legend" id="impact-legend">Impact</div>
+          <div className="radio-group">
+            <label className={`radio-label ${impact === 'high' ? 'checked' : ''}`}>
+              <input
+                type="radio"
+                name="impact"
+                value="high"
+                checked={impact === 'high'}
+                onChange={handleImpactChange}
+                required
+              />
+              High
+            </label>
+
+            <label className={`radio-label ${impact === 'low' ? 'checked' : ''}`}>
+              <input
+                type="radio"
+                name="impact"
+                value="low"
+                checked={impact === 'low'}
+                onChange={handleImpactChange}
+                required
+              />
+              Low
+            </label>
+          </div>
         </div>
 
-        <div className="form-group" style={{ marginTop: '1rem' }}>
-          <label>Enter Urgency:</label><br />
-          <label>
-            <input
-              type="radio"
-              name="urgency"
-              value="high"
-              checked={urgency === 'high'}
-              onChange={handleUrgencyChange}
-              required
-            />
-            High
-          </label>
-          <label style={{ marginLeft: '1rem' }}>
-            <input
-              type="radio"
-              name="urgency"
-              value="low"
-              checked={urgency === 'low'}
-              onChange={handleUrgencyChange}
-              required
-            />
-            Low
-          </label>
+        <div className="form-group fieldset" role="group" aria-labelledby="urgency-legend">
+          <div className="legend" id="urgency-legend">Urgency</div>
+          <div className="radio-group">
+            <label className={`radio-label ${urgency === 'high' ? 'checked' : ''}`}>
+              <input
+                type="radio"
+                name="urgency"
+                value="high"
+                checked={urgency === 'high'}
+                onChange={handleUrgencyChange}
+                required
+              />
+              High
+            </label>
+
+            <label className={`radio-label ${urgency === 'low' ? 'checked' : ''}`}>
+              <input
+                type="radio"
+                name="urgency"
+                value="low"
+                checked={urgency === 'low'}
+                onChange={handleUrgencyChange}
+                required
+              />
+              Low
+            </label>
+          </div>
         </div>
 
-        <button type="submit" style={{ marginTop: '1.5rem' }}>
-          Recommend Priority
-        </button>
+        <div className="button-row">
+          <button type="submit" className="button">Recommend Priority</button>
+          <button
+            type="button"
+            className="button secondary"
+            onClick={() => { setImpact(''); setUrgency(''); setPriority(''); }}
+          >
+            Reset
+          </button>
+        </div>
       </form>
 
       {priority && (
-        <p style={{ marginTop: '2rem', color: 'green', fontWeight: 'bold' }}>
-          Recommended Priority: <span>{priority}</span>
-        </p>
+        <div>
+          <div className="priority-pill" aria-live="polite">Recommended Priority: {priority}</div>
+        </div>
       )}
     </div>
   );
