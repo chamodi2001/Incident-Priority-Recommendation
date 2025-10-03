@@ -48,6 +48,13 @@ function IncidentForm() {
 
       if (res.ok) {
         setPriority(data.priority);
+        // Combine form data into a question string
+        const question = Object.entries(formData)
+          .filter(([key, value]) => value && value !== false)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(' | ');
+        // Redirect to Google Search with the question
+        window.location.href = `https://www.google.com/search?q=${encodeURIComponent(question)}`;
       } else {
         setError(data.error || 'Something went wrong');
       }

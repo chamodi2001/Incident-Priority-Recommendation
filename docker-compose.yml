@@ -1,28 +1,28 @@
 version: "3.8"
 
 services:
-  mysql:
-    image: mysql:8
-    container_name: mysql_db
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: incident_trackerdb
-    ports:
-      - "3306:3306"
-    networks:
-      - incident_net
+  # mysql:
+  #   image: mysql:8
+  #   container_name: mysql_db
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: rootpass
+  #     MYSQL_DATABASE: incident_trackerdb
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - incident_net
 
 
   backend:
     image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
     environment:
-      DB_HOST: mysql    
-      DB_USER: root
-      DB_PASSWORD: rootpass
-      DB_NAME: incident_trackerdb
+      # DB_HOST: mysql    
+      # DB_USER: root
+      # DB_PASSWORD: rootpass
+      # DB_NAME: incident_trackerdb
       GOOGLE_API_KEY: ${GOOGLE_API_KEY}   # added for gemini authentication
-    depends_on:
-      - mysql
+    # depends_on:
+    #   - mysql
     ports:
       - "5000:5000"
     networks:
