@@ -1,0 +1,188 @@
+name: Build and Deploy Incident Tracker
+
+on:
+  push:
+    branches:
+      - QAnew
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitHub Repository
+        uses: actions/checkout@v3
+         ##########
+      - name: Inject Gemini API Key into .env
+        run: echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> ./incident-tracker-server/.env
+          ##########
+
+      - name: Log in to GitLab Container Registry
+        run: |
+          echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u chamodigunathilaka2018 --password-stdin
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main ./incident-tracker-server
+          docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
+
+      - name: Build and Push Frontend Image
+        run: |
+          docker build -t registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main ./incident-tracker-client
+          docker push registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
+
+      - name: SSH into EC2 and Deploy
+        uses: appleboy/ssh-action@master
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+          INSTANCE_ID: ${{ secrets.INSTANCE_ID }}
+          ALARM_EMAIL: ${{ secrets.ALARM_EMAIL }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: GITLAB_TOKEN,HUB_TOKEN,INSTANCE_ID,ALARM_EMAIL,AWS_REGION,GOOGLE_API_KEY
+          script: |
+            echo "===== Checking Docker & Docker Compose ====="
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "Docker not found. Installing..."
+              sudo yum install -y docker
+              sudo systemctl enable docker
+              sudo systemctl start docker
+            fi
+
+            if ! command -v docker-compose >/dev/null 2>&1; then
+              echo "Docker Compose not found. Installing..."
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+            echo "===== Installing Nginx & Certbot ====="
+            if ! command -v nginx >/dev/null 2>&1; then
+              sudo yum install -y nginx
+              sudo systemctl enable nginx
+              sudo systemctl start nginx
+            fi
+
+            if ! command -v certbot >/dev/null 2>&1; then
+              sudo yum install -y certbot python3-certbot-nginx
+            fi
+
+            ######################################################################
+            echo "===== Configuring Nginx reverse proxy ====="
+            NGINX_CONF="/etc/nginx/conf.d/incidenttracker.conf"
+            sudo tee $NGINX_CONF > /dev/null <<EOF
+            # Redirect HTTP to HTTPS
+            server {
+                listen 80;
+                server_name inctrack.space www.inctrack.space;
+                return 301 https://\$host\$request_uri;
+            }
+
+            # HTTPS server block
+            server {
+                listen 443 ssl;
+                server_name inctrack.space www.inctrack.space;
+
+                ssl_certificate /etc/letsencrypt/live/inctrack.space/fullchain.pem;
+                ssl_certificate_key /etc/letsencrypt/live/inctrack.space/privkey.pem;
+                include /etc/letsencrypt/options-ssl-nginx.conf;
+                ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+                # Frontend (React app)
+                location / {
+                    proxy_pass http://127.0.0.1:3000;
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                }
+
+               # Backend (Express/Node app)
+                location /api/ {
+                    proxy_pass http://127.0.0.1:5000;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                }
+            }
+            EOF
+
+            sudo nginx -t
+            sudo systemctl reload nginx
+
+
+            echo "===== Issuing SSL certificate ====="
+            sudo certbot --nginx -d inctrack.space -d www.inctrack.space --non-interactive --agree-tos -m chamodigunathilaka2018@gmail.com
+            sudo certbot renew --dry-run
+
+
+            #############################################
+             echo "===== Installing Terraform on Amazon linux ====="
+             echo "===== Checking Terraform ====="
+             if ! command -v terraform >/dev/null 2>&1; then
+              sudo yum install -y yum-utils shadow-utils
+              sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+              sudo yum install terraform
+            fi
+            #############################################
+             echo "===== Checking Amazon-cloudwatch-agent ====="
+            if ! command -v amazon-cloudwatch-agent >/dev/null 2>&1; then
+              sudo yum install -y amazon-cloudwatch-agent
+              sudo systemctl start amazon-cloudwatch-agent
+              sudo systemctl enable amazon-cloudwatch-agent
+
+              sudo systemctl is-active amazon-cloudwatch-agent
+
+            fi
+            ##############################   
+                       
+            echo "===== Checking EC2 is in sync with GitHub main ====="
+            cd /home/ec2-user
+            if [ -d "IncidentTracker" ]; then
+              #if the directory exists
+              cd IncidentTracker
+              # git checkout main #git pull origin main
+              git fetch origin main
+              git reset --hard origin/main  
+            else
+              git clone --branch main https://$HUB_TOKEN@github.com/chamodi2001/IncidentTracker.git
+              # cd IncidentTracker
+            fi
+            pwd
+
+            #--------------------------#
+            echo "===== Running Terraform inside EC2 ====="
+
+            cd /home/ec2-user/IncidentTracker/terraform_disk_monitoring &&
+            echo "checking getting values from variables region=$AWS_REGION"
+
+            terraform init
+            terraform plan \
+            -var="instance_id=$INSTANCE_ID" \
+            -var="alarm_email=$ALARM_EMAIL" \
+            -var="aws_region=$AWS_REGION"
+
+            terraform apply -auto-approve \
+            -var="instance_id=$INSTANCE_ID" \
+            -var="alarm_email=$ALARM_EMAIL" \
+            -var="aws_region=$AWS_REGION"
+
+            
+            #--------------------##
+            echo "===== Deploying Docker containers ====="  
+            cd  /home/ec2-user/IncidentTracker
+            # echo "GOOGLE_API_KEY=$GOOGLE_API_KEY" > .env
+            export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+            docker-compose down
+            docker image prune -af   # remove all unused/dangling images safely 
+            # docker system prune -af --volumes : Remove unused containers, networks, images, build cache
+            docker-compose pull
+            docker-compose up -d --build
+            docker-compose ps
