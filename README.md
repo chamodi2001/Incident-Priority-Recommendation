@@ -1,5 +1,6 @@
 # IncidentTracker
-Incident Tracker is a lightweight web application which allow users to submit incident reports and receive an estimated priority based on their responses. Future enhancements include integrating AI for smarter priority classification.
+Incident Tracker is a lightweight web application which allow users to submit the urgency and impact of an incident and automatically recommends a priority level. The app is containerized with Docker, with GitLab for handling image builds and storage, and GitHub Actions automating deployment to AWS EC2. Monitoring with CloudWatch alarm (billing and disk usage).
+
 
 _**Tech Stack**_
 
