@@ -20,13 +20,13 @@ jobs:
 
       - name: Build and Push Backend Image
         run: |
-          docker build -t registry.gitlab.com/chamodigunathilaka2018/Incident-Priority-Recommendation/incident-tracker-server:main ./incident-tracker-server
-          docker push registry.gitlab.com/chamodigunathilaka2018/Incident-Priority-Recommendation/incident-tracker-server:main
+          docker build -t registry.gitlab.com/chamodigunathilaka2018/incident-priority-recommendation/incident-tracker-server:main ./incident-tracker-server
+          docker push registry.gitlab.com/chamodigunathilaka2018/incident-priority-recommendation/incident-tracker-server:main
 
       - name: Build and Push Frontend Image
         run: |
-          docker build --build-arg REACT_APP_API_BASE_URL= -t registry.gitlab.com/chamodigunathilaka2018/Incident-Priority-Recommendation/incident-tracker-client:main ./incident-tracker-client
-          docker push registry.gitlab.com/chamodigunathilaka2018/Incident-Priority-Recommendation/incident-tracker-client:main
+          docker build --build-arg REACT_APP_API_BASE_URL= -t registry.gitlab.com/chamodigunathilaka2018/incident-priority-recommendation/incident-tracker-client:main ./incident-tracker-client
+          docker push registry.gitlab.com/chamodigunathilaka2018/incident-priority-recommendation/incident-tracker-client:main
 
       - name: SSH into EC2 and Deploy
         uses: appleboy/ssh-action@master
