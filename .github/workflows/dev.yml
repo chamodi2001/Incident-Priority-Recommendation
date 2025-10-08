@@ -142,20 +142,20 @@ jobs:
             cd /home/ec2-user
             if [ -d "IncidentTracker" ]; then
               #if the directory exists
-              cd IncidentTracker
+              cd incident-priority-recommendation
               # git checkout main #git pull origin main
               git fetch origin main
               git reset --hard origin/main  
             else
               git clone --branch main https://$HUB_TOKEN@github.com/chamodi2001/IncidentTracker.git
-              # cd IncidentTracker
+              # cd incident-priority-recommendation
             fi
             pwd
 
             #--------------------------#
             echo "===== Running Terraform inside EC2 ====="
 
-            cd /home/ec2-user/IncidentTracker/terraform_disk_monitoring &&
+            cd /home/ec2-user/incident-priority-recommendation/terraform_disk_monitoring &&
             echo "checking getting values from variables region=$AWS_REGION"
 
             terraform init
@@ -172,7 +172,7 @@ jobs:
             
             #--------------------##
             echo "===== Deploying Docker containers ====="  
-            cd  /home/ec2-user/IncidentTracker
+            cd  /home/ec2-user/incident-priority-recommendation
             docker-compose down
             docker image prune -af   # remove all unused/dangling images safely 
             # docker system prune -af --volumes : Remove unused containers, networks, images, build cache
