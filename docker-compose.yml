@@ -13,7 +13,7 @@ services:
       - incident_net
 
   backend:
-    image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-server:main
+    image: registry.gitlab.com/chamodigunathilaka2018/Incident-Priority-Recommendation/incident-tracker-server:main
     environment:
       DB_HOST: mysql    
       DB_USER: root
@@ -27,7 +27,7 @@ services:
       - incident_net
 
   frontend:
-    image: registry.gitlab.com/chamodigunathilaka2018/incidenttracker/incident-tracker-client:main
+    image: registry.gitlab.com/chamodigunathilaka2018/Incident-Priority-Recommendation/incident-tracker-client:main
     ports:
       - "3000:3000"
     depends_on:
