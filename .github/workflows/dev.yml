@@ -69,7 +69,7 @@ jobs:
 
             ######################################################################
             echo "===== Configuring Nginx reverse proxy ====="
-            NGINX_CONF="/etc/nginx/conf.d/incidenttracker.conf"
+            NGINX_CONF="/etc/nginx/conf.d/incident-priority-recommendation.conf"
             sudo tee $NGINX_CONF > /dev/null <<EOF
             # Redirect HTTP to HTTPS
             server {
